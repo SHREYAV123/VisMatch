@@ -17,6 +17,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // Add safety checks for required fields
+  if (!product) {
+    console.error('ProductCard: product prop is undefined');
+    return null;
+  }
+
+  if (!product.name || !product.imageUrl || typeof product.price !== 'number' || typeof product.similarityScore !== 'number') {
+    console.error('ProductCard: missing required fields', product);
+    return null;
+  }
+
   const getSimilarityColor = (score: number): string => {
     if (score >= 0.8) return 'bg-green-500';
     if (score >= 0.6) return 'bg-yellow-500';
@@ -102,7 +113,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </div>
               
               <div className="flex flex-wrap gap-1 mb-3">
-                {product.tags.slice(0, 4).map((tag, index) => (
+                {(product.tags || []).slice(0, 4).map((tag, index) => (
                   <span
                     key={index}
                     className="px-2 py-1 text-xs text-blue-700 rounded-full bg-blue-50"
@@ -218,7 +229,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         
         <div className="flex flex-wrap gap-1 mb-4">
-          {product.tags.slice(0, 3).map((tag, index) => (
+          {(product.tags || []).slice(0, 3).map((tag, index) => (
             <span
               key={index}
               className="px-2 py-1 text-xs text-blue-700 rounded-full bg-blue-50"
@@ -226,9 +237,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
               {tag}
             </span>
           ))}
-          {product.tags.length > 3 && (
+          {(product.tags || []).length > 3 && (
             <span className="px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded-full">
-              +{product.tags.length - 3}
+              +{(product.tags || []).length - 3}
             </span>
           )}
         </div>

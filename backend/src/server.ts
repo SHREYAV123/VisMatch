@@ -1,14 +1,13 @@
 // server.ts - Main Express Server
 import express from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { Request, Response, NextFunction } from "express";
 
 // Import routes
 import productRoutes from './routes/productRoutes';
 import searchRoutes from './routes/searchRoutes';
-import Product from './models/Product';
+import DataService from './services/dataService';
 
 dotenv.config();
 
@@ -20,10 +19,8 @@ app.use(cors());
 app.use(express.json({ limit: '30mb' }));
 app.use(express.urlencoded({ extended: true, limit: '30mb' }));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI as string)
-  .then(() => console.log('✅ Connected to MongoDB Atlas'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+// Database info
+console.log('🗄️ Using MongoDB Atlas cloud database');
 
 // API Routes
 
@@ -43,7 +40,7 @@ app.use('/api/search', searchRoutes);
 // Get categories endpoint (moved from productRoutes to maintain API structure)
 app.get('/api/categories', async (req, res) => {
   try {
-    const categories = await Product.distinct('category');
+    const categories = await DataService.distinct('category');
     res.json({ categories });
   } catch (error) {
     console.error('Categories error:', error);
@@ -54,7 +51,7 @@ app.get('/api/categories', async (req, res) => {
 // Get brands endpoint (moved from productRoutes to maintain API structure)
 app.get('/api/brands', async (req, res) => {
   try {
-    const brands = await Product.distinct('brand');
+    const brands = await DataService.distinct('brand');
     res.json({ brands });
   } catch (error) {
     console.error('Brands error:', error);

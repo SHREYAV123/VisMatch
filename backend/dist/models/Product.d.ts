@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 export interface IProduct extends mongoose.Document {
+    _id: mongoose.Types.ObjectId;
     name: string;
     category: string;
     price: number;
@@ -12,7 +13,7 @@ export interface IProduct extends mongoose.Document {
     updatedAt: Date;
 }
 export declare const Product: mongoose.Model<IProduct, {}, {}, {}, mongoose.Document<unknown, {}, IProduct, {}, {}> & IProduct & Required<{
-    _id: unknown;
+    _id: mongoose.Types.ObjectId;
 }> & {
     __v: number;
 }, any>;

@@ -1,5 +1,5 @@
 import express from 'express';
-import Product from '../models/Product';
+import DataService from '../services/dataService';
 
 const router = express.Router();
 
@@ -25,12 +25,20 @@ router.get('/', async (req, res) => {
       filter.brand = new RegExp(brand, 'i');
     }
 
-    const total = await Product.countDocuments(filter);
-    const products = await Product.find(filter)
-      .select('-imageFeatures') // Exclude heavy feature vectors from listing
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    const allProducts = await DataService.find(filter);
+    const total = allProducts.length;
+    
+    // Manual pagination and sorting
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const products = allProducts
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(startIndex, endIndex)
+      .map(product => {
+        // Remove imageFeatures for lighter response
+        const { imageFeatures, ...productWithoutFeatures } = product;
+        return productWithoutFeatures;
+      });
 
     res.json({
       products,

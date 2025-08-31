@@ -5,20 +5,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const productRoutes_1 = __importDefault(require("./routes/productRoutes"));
 const searchRoutes_1 = __importDefault(require("./routes/searchRoutes"));
-const Product_1 = __importDefault(require("./models/Product"));
+const dataService_1 = __importDefault(require("./services/dataService"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json({ limit: '30mb' }));
 app.use(express_1.default.urlencoded({ extended: true, limit: '30mb' }));
-mongoose_1.default.connect(process.env.MONGODB_URI)
-    .then(() => console.log('✅ Connected to MongoDB Atlas'))
-    .catch(err => console.error('❌ MongoDB connection error:', err));
+console.log('🗄️ Using MongoDB Atlas cloud database');
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'OK',
@@ -30,7 +27,7 @@ app.use('/api/products', productRoutes_1.default);
 app.use('/api/search', searchRoutes_1.default);
 app.get('/api/categories', async (req, res) => {
     try {
-        const categories = await Product_1.default.distinct('category');
+        const categories = await dataService_1.default.distinct('category');
         res.json({ categories });
     }
     catch (error) {
@@ -40,7 +37,7 @@ app.get('/api/categories', async (req, res) => {
 });
 app.get('/api/brands', async (req, res) => {
     try {
-        const brands = await Product_1.default.distinct('brand');
+        const brands = await dataService_1.default.distinct('brand');
         res.json({ brands });
     }
     catch (error) {

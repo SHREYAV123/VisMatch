@@ -46,11 +46,23 @@ const ImageUpload: React.FC<Props> = ({ onSearchResults, onLoadingChange, filter
         imageUrl: activeTab === 'url' ? imageUrl : null,
         filters
       });
+      
+      if (!Array.isArray(results)) {
+        console.error('Invalid response format:', results);
+        toast.error('Invalid response from server');
+        return;
+      }
+      
       onSearchResults(results);
-      toast.success(`Found ${results.length} similar products`);
-    } catch (err) {
-      console.error(err);
-      toast.error('Search failed. Please try again.');
+      if (results.length === 0) {
+        toast.success('No similar products found. Try adjusting your filters.');
+      } else {
+        toast.success(`Found ${results.length} similar products`);
+      }
+    } catch (err: any) {
+      console.error('Search error:', err);
+      const errorMessage = err.response?.data?.error || err.message || 'Search failed. Please try again.';
+      toast.error(errorMessage);
     } finally {
       onLoadingChange(false);
     }
